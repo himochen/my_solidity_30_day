@@ -1,0 +1,42 @@
+pragma solidity >=0.4.22 <0.6.0;
+
+contract Ownable {
+  address payable public owner;
+
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  modifier onlyOwner() {
+    if (msg.sender == owner)
+      _;
+  }
+
+  function transferOwnership(address payable newOwner) public onlyOwner {
+    if (newOwner != address(0)) owner = newOwner;
+  }
+}
+
+contract WHO is Ownable {
+    struct CountryStatus {
+        uint256 positive_num;
+        uint256 death_num;
+        bool is_alive;
+    }
+    
+    mapping (string => CountryStatus) _world_status;
+    
+    constructor() public {}
+    
+    function Update(string memory country, uint256 positive_num, uint256 death_num) public onlyOwner {
+        _world_status[country].positive_num = positive_num;
+        _world_status[country].death_num = death_num;
+        _world_status[country].is_alive = true;
+    }
+    
+    function GetStatus(string memory country) public view returns (uint256, uint256) {
+        require(_world_status[country].is_alive);
+        
+        return (_world_status[country].positive_num, _world_status[country].death_num);
+    }
+}
